@@ -13,10 +13,10 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
-import tacos.Ingredient;
-import tacos.Ingredient.Type;
-import tacos.Order;
-import tacos.Taco;
+import tacos.model.Ingredient;
+import tacos.model.Ingredient.Type;
+import tacos.model.Order;
+import tacos.model.Taco;
 import tacos.data.IngredientRepository;
 import tacos.data.TacoRepository;
 
