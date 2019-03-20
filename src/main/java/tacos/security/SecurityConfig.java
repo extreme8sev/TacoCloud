@@ -1,6 +1,7 @@
 package tacos.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,24 +21,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new StandardPasswordEncoder("53cr3t");
     }
 
+    @Qualifier("userRepositoryUserDetailsService")
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
             throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
+        auth
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(encoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+                .authorizeRequests()
                 .antMatchers("/design", "/orders")
                 .access("hasRole('ROLE_USER')")
-                .antMatchers("/", "/**").access("permitAll()")
+                .antMatchers("/**").access("permitAll")
+
                 .and()
-                .formLogin().loginPage("/login").defaultSuccessUrl("/design", true)
+                .formLogin()
+                .loginPage("/login")
+
                 .and()
-                .logout().logoutSuccessUrl("/");
+                .logout()
+                .logoutSuccessUrl("/")
+
+                .and()
+                .csrf()
+                .ignoringAntMatchers("/h2-console/**")
+
+                // Allow pages to be loaded in frames from the same origin; needed for H2-Console
+                .and()
+                .headers()
+                .frameOptions()
+                .sameOrigin()
+        ;
     }
 }
